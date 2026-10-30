@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agentaisle",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-05-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "./dist/web", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*", "/mcp", "/mandates/*", "/checkout/*", "/mock-paypal/*"] },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "agentaisle", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+  ],
+  "durable_objects": { "bindings": [{ "name": "MANDATE_LEDGER", "class_name": "MandateLedger" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MandateLedger"] }],
+  "triggers": { "crons": ["*/10 * * * *"] },
+  "vars": {
+    "PAYPAL_MODE": "mock",
+    "PAYPAL_API_BASE": "https://api-m.sandbox.paypal.com",
+    "DEMO_MODE": "false",
+    "SIMULATOR_ENABLED": "true",
+    "SIMULATOR_SESSIONS_PER_TICK": "3",
+    "LLM_MODE": "stub"
+  },
+  // Public hackathon demo: `npm run deploy:demo` -> Worker "agentaisle-demo" on workers.dev (Cloudflare free plan).
+  // PayPal SANDBOX only. Secrets (wrangler secret put --env demo): PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET,
+  // PAYPAL_WEBHOOK_ID, MERCHANT_TOKEN, SIM_VAULT_ID. Bindings/vars/triggers are not inherited by envs, so they are repeated.
+  "env": {
+    "demo": {
+      "workers_dev": true,
+      "d1_databases": [
+        { "binding": "DB", "database_name": "agentaisle-demo", "database_id": "b67d0d23-46f7-4a16-b9c7-f32e4d87deef", "migrations_dir": "migrations" }
+      ],
+      "durable_objects": { "bindings": [{ "name": "MANDATE_LEDGER", "class_name": "MandateLedger" }] },
+      "triggers": { "crons": ["17 * * * *"] },
+      "vars": {
+        "PAYPAL_MODE": "sandbox",
+        "PAYPAL_API_BASE": "https://api-m.sandbox.paypal.com",
+        "DEMO_MODE": "true",
+        "PUBLIC_BASE_URL": "https://agentaisle-demo.kamalkatul92-kk.workers.dev",
+        "SIMULATOR_ENABLED": "true",
+        "SIMULATOR_SESSIONS_PER_TICK": "2",
+        "LLM_MODE": "stub"
+      }
+    }
+  }
+}

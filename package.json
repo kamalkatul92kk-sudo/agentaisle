@@ -1,0 +1,47 @@
+{
+  "name": "agentaisle",
+  "version": "1.0.0",
+  "description": "Agent-ready storefront: MCP + checkout API for AI buyer agents, PayPal Orders v2/Vault, merchant console.",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p . && cd web && tsc -p .",
+    "dev": "wrangler dev",
+    "dev:web": "npm --prefix web run dev",
+    "build:web": "npm --prefix web run build",
+    "migrate:local": "wrangler d1 migrations apply agentaisle --local",
+    "migrate:demo": "wrangler d1 migrations apply agentaisle-demo --remote --env demo",
+    "deploy:demo": "npm run build:web && wrangler deploy --env demo",
+    "smoke": "node scripts/smoke-wrangler.mjs",
+    "gonogo": "node scripts/sandbox-go-no-go.mjs",
+    "gonogo:path-b": "node scripts/sandbox-go-no-go.mjs --path-b",
+    "gonogo:fake": "node scripts/sandbox-go-no-go.mjs --fake",
+    "fallback": "node scripts/sandbox-fallback-approval.mjs",
+    "fallback:fake": "node scripts/sandbox-fallback-approval.mjs --fake",
+    "probe:sandbox": "PAYPAL_SANDBOX_PROBE=1 vitest run test/paypalRest.sandbox.test.ts",
+    "verify:grid": "node scripts/verify-grid-vs-paypal.mjs"
+  },
+  "author": "Kamal Katul",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "hono": "^4.13.14",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260702.1",
+    "@types/node": "^26.6.5",
+    "@types/sql.js": "^1.4.11",
+    "sql.js": "^1.15.2",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7",
+    "wrangler": "^4.86.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "esbuild@0.27.3": true,
+    "workerd@1.20260426.1": true,
+    "sharp": false
+  },
+  "private": true
+}

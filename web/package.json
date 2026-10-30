@@ -1,0 +1,34 @@
+{
+  "name": "agentaisle-web",
+  "version": "1.0.0",
+  "description": "AgentAisle merchant console (AG Grid Community widgets + AG Studio drop-in)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p . && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "Kamal Katul",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "ag-charts-community": "^14.2.0",
+    "ag-charts-react": "^14.2.0",
+    "ag-grid-community": "^36.2.0",
+    "ag-grid-react": "^36.2.0",
+    "ag-studio": "^3.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  },
+  "private": true
+}
