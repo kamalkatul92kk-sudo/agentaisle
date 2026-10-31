@@ -10,7 +10,7 @@
 
 **Repo:** https://github.com/kamalkatul92kk-sudo/agentaisle
 
-**Video:** {{VIDEO_URL}} (2:43, 1080p, synthetic narration + burned-in captions; cover image `submission/video/cover.png`)
+**Video:** https://youtu.be/0LZBDRTz6PQ (2:44, 1080p, synthetic narration + burned-in captions; cover image `submission/video/cover.png`)
 
 ---
 
@@ -148,7 +148,7 @@ No login, token or install is needed. Everything runs on the PayPal **sandbox** 
   - An OpenAI-compatible client can be switched on (`LLM_MODE=openai`), but LLM output can never set prices, links or actions.
 - **In development (draft, confirm before submitting):**
   - An AI coding assistant (Grok Bot) helped write and test code, run the PayPal sandbox checks, draft this write-up and the docs, and record the demo video.
-  - The video narration is synthetic speech from Piper, an open-source local text-to-speech engine, using the public-domain LJ Speech voice. It does not imitate any real person.
+  - The video narration is synthetic speech generated with xAI Grok Text to Speech (voice "Ara"). It does not imitate any real person.
   - Every number, ID and screenshot in this submission comes from real runs against the PayPal sandbox; the architecture card and the terminal clip in the video replay real captured output rather than being live screen captures, and the video says so on screen.
 
 ## Disclaimer for judges

@@ -1,6 +1,6 @@
 # AgentAisle: demo video script (target 2:40, hard limit < 3:00)
 
-> **As recorded (Oct 29, 2026):** the finished cut is {{VIDEO_URL}} (2:43.7). It was recorded **read-only**, with no merchant token: the new rows come from the real hourly simulator run, and Approve is hovered but not clicked. The narration is synthetic (Piper TTS, public-domain LJ Speech voice) with burned-in captions. See `video/NOTES.md`. To re-record with your own voice, follow the script below.
+> **As recorded (Oct 29, 2026):** the finished cut is https://youtu.be/0LZBDRTz6PQ (2:44, narration re-voiced Oct 30, 2026 with lightly reworded lines). It was recorded **read-only**, with no merchant token: the new rows come from the real hourly simulator run, and Approve is hovered but not clicked. The narration is synthetic (xAI Grok Text to Speech, voice "Ara") with burned-in captions. See `video/NOTES.md`. To re-record with your own voice, follow the script below.
 
 **Rules:**
 - The video must be **under 3 minutes**; judges need not watch past 3:00.
