@@ -133,7 +133,9 @@ function Inspector({ row, onClose, onReplay }: { row: SessionRow | null; onClose
   if (!row) return null;
   const cols: ColDef<EventRow>[] = [
     { field: 'ts', headerName: 'Time', width: 110, valueFormatter: (p) => fmtTime(p.value), sort: 'asc' },
-    { field: 'type', width: 330, cellRenderer: (p: { value: string }) => <code className={p.value.startsWith('webhook.') ? 'hooktype' : ''}>{p.value.startsWith('webhook.') ? '🔏 ' : ''}{p.value}</code> },
+    { field: 'type', width: 330, cellRenderer: (p: { value: string }) => p.value === 'ai.model' ? <span className="aibadge model" title="Answered by the AI model (validated by code)">model</span>
+      : p.value === 'ai.fallback' ? <span className="aibadge fallback" title="Model unavailable, invalid or rejected by a guardrail; deterministic rules answered">fallback</span>
+      : <code className={p.value.startsWith('webhook.') ? 'hooktype' : ''}>{p.value.startsWith('webhook.') ? '🔏 ' : ''}{p.value}</code> },
     { field: 'summary', flex: 1, wrapText: true, autoHeight: true },
   ];
   const hooks = events.filter((e) => e.type.startsWith('webhook.')).length;

@@ -4,7 +4,8 @@ import { sha256 } from '../domain/deps';
 import { importVaultedMandate, startMandate, finishMandate } from '../domain/mandates';
 import { captureApprovedOrder } from '../domain/checkout';
 import { MockPayPalGateway } from '../adapters/paypalMock';
-import { LlmPlanner, ScriptedPlanner, runBuyer, seededRng, type RunResult } from '../agents/buyerAgent';
+import { AiPlanner, ScriptedPlanner, runBuyer, seededRng, type Planner, type RunResult } from '../agents/buyerAgent';
+import { aiStructured, logAi } from '../ai/structured';
 import { mcpToolCaller } from '../agents/toolCaller';
 import { PERSONAS, SIM_MANDATES } from './personas';
 import type { Category } from '../domain/types';
@@ -34,20 +35,28 @@ export async function ensureSimMandates(d: Deps, secret: string, simVaultId?: st
   return tokens;
 }
 
-export interface SimOptions { sessions: number; seed?: number; secret: string; simVaultId?: string; autoApproveLinks?: number; useLlmPlanner?: boolean }
+export interface SimOptions { sessions: number; seed?: number; secret: string; simVaultId?: string; autoApproveLinks?: number;
+  /** Use the configured model for buyer decisions (default true when a real model is configured; stub always scripted). */
+  useAi?: boolean }
 
 export async function runSimulation(d: Deps, mcpHandler: (req: Request) => Promise<Response>, o: SimOptions) {
   const tokens = await ensureSimMandates(d, o.secret, o.simVaultId);
   const rng = seededRng(o.seed ?? Date.now());
-  const planner = o.useLlmPlanner && d.llm.name !== 'stub' ? new LlmPlanner(d.llm) : new ScriptedPlanner();
+  const useAi = (o.useAi ?? true) && d.llm.name !== 'stub';
+  const scripted = new ScriptedPlanner();
   const results: RunResult[] = [];
   const runId = `sim${Math.floor(rng.next() * 1e9).toString(36)}`;
   for (let i = 0; i < o.sessions; i++) {
     const p = PERSONAS[Math.floor(rng.next() * PERSONAS.length)]!;
     if (p.paymentMode === 'mandate' && p.mandateKey && !tokens[p.mandateKey]) continue; // sandbox without SIM_VAULT_ID
     const agentNo = 1 + Math.floor(rng.next() * 3);
-    const call = mcpToolCaller(mcpHandler, `${d.config.publicBaseUrl}/mcp`, { 'x-agent-id': `sim-${p.key}-${agentNo}`, 'x-agent-platform': p.platform, 'x-agent-name': `${p.displayName} #${agentNo}` });
-    const r = await runBuyer(call, p, { planner, rng, mandateToken: p.mandateKey ? tokens[p.mandateKey] : undefined, runId: `${runId}-${i}` });
+    const agentId = `sim-${p.key}-${agentNo}`;
+    const call = mcpToolCaller(mcpHandler, `${d.config.publicBaseUrl}/mcp`, { 'x-agent-id': agentId, 'x-agent-platform': p.platform, 'x-agent-name': `${p.displayName} #${agentNo}` });
+    const ai = useAi ? new AiPlanner((req) => aiStructured(d, req), () => d.clock.now(), scripted) : null;
+    const planner: Planner = ai ?? scripted;
+    const budgetCents = SIM_MANDATES.find((m) => m.key === p.mandateKey)?.perOrderCapCents;
+    const r = await runBuyer(call, p, { planner, rng, mandateToken: p.mandateKey ? tokens[p.mandateKey] : undefined, runId: `${runId}-${i}`, budgetCents });
+    for (const rec of ai?.log ?? []) await logAi(d, rec.outcome, { purpose: rec.purpose, sessionId: r.checkoutId, agentId, note: rec.note, ts: rec.ts });
     if (r.status === 'requires_buyer_action' && d.payments instanceof MockPayPalGateway && rng.next() < (o.autoApproveLinks ?? 0.7)) {
       const s = await d.store.getSession(r.checkoutId!);
       await d.payments.approveOrder(s!.paypalOrderId!);

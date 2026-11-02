@@ -79,7 +79,7 @@ export async function negotiate(d: Deps, ctx: AgentCtx, id: string, offerGoodsCe
   if (s.status !== 'open') throw new DomainError('not_editable', `Checkout is ${s.status}`, 409);
   const q = await requote(d, s);
   const dec = decideOffer(q, s.negotiation, offerGoodsCents);
-  const message = await phraseNegotiation(d, dec, offerGoodsCents);
+  const message = await phraseNegotiation(d, dec, offerGoodsCents, { sessionId: s.id, agentId: ctx.agentId });
   s.negotiation.rounds.push({ round: dec.round, offerCents: offerGoodsCents, decision: dec.decision, merchantPriceCents: dec.merchantPriceCents, message, at: d.clock.now().toISOString() });
   if (dec.final) s.negotiation.locked = true;
   if (dec.agreedCents != null) s.negotiation.agreedTotalBeforeShippingCents = dec.agreedCents;

@@ -5,6 +5,8 @@ export interface AppConfig {
   merchantName: string;
   /** Set true only when the PayPal mode is mock or sandbox; never for live. */
   allowDemoReset: boolean;
+  /** Real-model guard rails: per-call timeout and a daily cap on attempted model calls (keeps Workers AI inside its free daily allocation). */
+  ai?: { timeoutMs: number; dailyModelCalls: number; dailyNeurons?: number };
 }
 
 export interface Deps {

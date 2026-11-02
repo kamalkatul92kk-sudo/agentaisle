@@ -19,6 +19,8 @@ export function eventSummary(e: DomainEvent): string {
     case 'payment.refunded': return `refunded ${fmt(x.amountCents)}`;
     case 'payment.declined': return `payment declined`;
     case 'payment.failed': return `payment error`;
+    case 'ai.model': return `🤖 ${x.purpose} by ${String(x.model).replace(/^workers-ai:@cf\//, '')} (${x.ms} ms): ${x.note}`;
+    case 'ai.fallback': return `⚙️ ${x.purpose} fallback (${x.reason}): ${x.note}`;
     case 'approval.proposed': return `${x.kind} proposed by ${x.requestedBy}`;
     case 'approval.executed': return `${x.kind} approved & executed`;
     case 'approval.rejected': return `${x.kind} rejected by merchant`;

@@ -11,13 +11,20 @@
   "durable_objects": { "bindings": [{ "name": "MANDATE_LEDGER", "class_name": "MandateLedger" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MandateLedger"] }],
   "triggers": { "crons": ["*/10 * * * *"] },
+  // Workers AI (no API key; 10,000 free Neurons/day on every plan). Only used when LLM_MODE is "workers-ai".
+  "ai": { "binding": "AI" },
   "vars": {
     "PAYPAL_MODE": "mock",
     "PAYPAL_API_BASE": "https://api-m.sandbox.paypal.com",
     "DEMO_MODE": "false",
     "SIMULATOR_ENABLED": "true",
     "SIMULATOR_SESSIONS_PER_TICK": "3",
-    "LLM_MODE": "stub"
+    // stub = deterministic rules only; workers-ai = real model via the AI binding (falls back to rules on any failure).
+    "LLM_MODE": "stub",
+    "LLM_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "LLM_TIMEOUT_MS": "8000",
+    "LLM_DAILY_CALLS": "400",
+    "LLM_DAILY_NEURONS": "8000"
   },
   // Public hackathon demo: `npm run deploy:demo` -> Worker "agentaisle-demo" on workers.dev (Cloudflare free plan).
   // PayPal SANDBOX only. Secrets (wrangler secret put --env demo): PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET,
@@ -30,6 +37,7 @@
       ],
       "durable_objects": { "bindings": [{ "name": "MANDATE_LEDGER", "class_name": "MandateLedger" }] },
       "triggers": { "crons": ["17 * * * *"] },
+      "ai": { "binding": "AI" },
       "vars": {
         "PAYPAL_MODE": "sandbox",
         "PAYPAL_API_BASE": "https://api-m.sandbox.paypal.com",
@@ -37,7 +45,12 @@
         "PUBLIC_BASE_URL": "https://agentaisle-demo.kamalkatul92-kk.workers.dev",
         "SIMULATOR_ENABLED": "true",
         "SIMULATOR_SESSIONS_PER_TICK": "2",
-        "LLM_MODE": "stub"
+        // Real model on the public demo (takes effect on the next deploy). Any failure falls back to the rules.
+        "LLM_MODE": "workers-ai",
+        "LLM_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "LLM_TIMEOUT_MS": "8000",
+        "LLM_DAILY_CALLS": "400",
+    "LLM_DAILY_NEURONS": "8000"
       }
     }
   }

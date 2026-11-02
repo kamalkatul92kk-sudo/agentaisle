@@ -44,7 +44,7 @@ export function App() {
   return (<GridThemeContext.Provider value={themeName}>
     <header>
       <h1>☕ AgentAisle · Pecan Plume Coffee Co.</h1>
-      <span className="mode">PayPal: {snap?.paypalMode ?? '…'} · LLM: {snap?.llm ?? '…'}</span>
+      <span className="mode">PayPal: {snap?.paypalMode ?? '…'} · AI: {snap?.llm === 'stub' ? 'rules only (no model configured)' : snap?.llm ?? '…'}</span>
       <span className="spacer" />
       <button className="ghost" style={{ color: '#f6efe6', borderColor: '#8c6b4f' }} onClick={() => setThemeName(themeName === 'dark' ? 'light' : 'dark')} aria-label="Toggle dark theme">{themeName === 'dark' ? '☀ Light' : '☾ Dark'}</button>
       <input type="password" placeholder="merchant token" defaultValue={getToken()} onBlur={(e) => { setToken(e.target.value); refresh(); }} style={{ width: 180 }} />
@@ -74,7 +74,7 @@ export function App() {
       {tab === 'replay' && <div className="card">{replay ? <SessionReplay header={`Session ${String(replay.session.id)} · ${String(replay.session.agentId)} · ${String(replay.session.status)}`} events={replay.events} /> : <p className="muted">Pick a session on the Live tab.</p>}</div>}
       {tab === 'ops' && <div className="card chat">
         <p className="muted">The ops agent reads store data and can only <b>propose</b> actions (refunds, prices, new products). Each one lands in the approval queue.</p>
-        {chat.map((c, i) => c.me ? <div key={i} className="msg me">{c.me}</div> : <div key={i} className="msg bot">{c.bot!.reply}{c.bot!.proposals.length ? `\n\n→ ${c.bot!.proposals.length} proposal(s) sent to Approvals` : ''}</div>)}
+        {chat.map((c, i) => c.me ? <div key={i} className="msg me">{c.me}</div> : <div key={i} className="msg bot">{c.bot!.ai?.map((a, j) => <span key={j} className={`aibadge ${a.provider}`} title={a.reason ?? a.model}>{a.purpose}: {a.provider}</span>)}{c.bot!.ai?.length ? '\n' : ''}{c.bot!.reply}{c.bot!.proposals.length ? `\n\n→ ${c.bot!.proposals.length} proposal(s) sent to Approvals` : ''}</div>)}
         <form onSubmit={(e) => { e.preventDefault(); if (msg.trim()) sendOps(msg.trim()); }} style={{ display: 'flex', gap: 8 }}>
           <input value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="e.g. What are agents asking for that we don't sell?" style={{ flex: 1 }} />
           <button className="primary">Send</button>

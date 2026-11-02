@@ -95,6 +95,20 @@ export class SqlStore implements Store {
   async listSessions(opts?: { sinceIso?: string; limit?: number }) {
     return (await this.all('SELECT * FROM checkout_sessions WHERE created_at >= ? ORDER BY created_at DESC LIMIT ?', opts?.sinceIso ?? '', opts?.limit ?? 1000)).map(toSession);
   }
+  async reserveModelCall(day: string, caps: { calls: number; neurons: number }) {
+    // Check, then reserve atomically: the UPDATE only increments while both caps still have room.
+    await this.run('INSERT OR IGNORE INTO ai_usage (day) VALUES (?)', day);
+    const r = await this.run('UPDATE ai_usage SET calls = calls + 1 WHERE day = ? AND calls < ? AND neurons < ?', day, caps.calls, caps.neurons);
+    const u = await this.getModelUsage(day);
+    return { allowed: (r.meta?.changes ?? 0) > 0, ...u };
+  }
+  async recordModelUsage(day: string, u: { inputTokens: number; outputTokens: number; neurons: number }) {
+    await this.run('UPDATE ai_usage SET tokens_in = tokens_in + ?, tokens_out = tokens_out + ?, neurons = neurons + ? WHERE day = ?', u.inputTokens, u.outputTokens, u.neurons, day);
+  }
+  async getModelUsage(day: string) {
+    const r = await this.first('SELECT calls, tokens_in, tokens_out, neurons FROM ai_usage WHERE day = ?', day);
+    return { calls: Number(r?.calls ?? 0), tokensIn: Number(r?.tokens_in ?? 0), tokensOut: Number(r?.tokens_out ?? 0), neurons: Number(r?.neurons ?? 0) };
+  }
   async countCompletedByAgentSince(agentId: string, since: string) {
     const r = await this.first("SELECT COUNT(*) AS n FROM checkout_sessions WHERE agent_id = ? AND status = 'completed' AND completed_at >= ?", agentId, since);
     return Number(r?.n ?? 0);

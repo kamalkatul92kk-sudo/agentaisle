@@ -12,7 +12,8 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export interface SimResult { sessions: number; completed: number; held: number; rejected: number; abandoned: number; awaitingBuyer: number; deniedMandate: number; errors: number }
-export interface OpsReply { reply: string; steps: { tool: string; result: unknown }[]; proposals: ApprovalRow[] }
+export interface OpsAiBadge { purpose: string; provider: 'model' | 'fallback'; model: string; reason: string | null }
+export interface OpsReply { reply: string; steps: { tool: string; result: unknown }[]; proposals: ApprovalRow[]; ai?: OpsAiBadge[] }
 export interface Replay { session: Record<string, unknown>; events: EventRow[]; payment: Record<string, unknown> | null }
 
 export const api = {

@@ -31,6 +31,10 @@ export interface Store {
   getSessionByOrderId(orderId: string): Promise<CheckoutSession | null>;
   getSessionByIdempotencyKey(key: string): Promise<CheckoutSession | null>;
   listSessions(opts?: { sinceIso?: string; limit?: number }): Promise<CheckoutSession[]>;
+  /** Daily real-model budget (table ai_usage, not cleared by resetDemo). Reserve a call before making it; false = budget spent. */
+  reserveModelCall(day: string, caps: { calls: number; neurons: number }): Promise<{ allowed: boolean } & ModelUsage>;
+  recordModelUsage(day: string, u: { inputTokens: number; outputTokens: number; neurons: number }): Promise<void>;
+  getModelUsage(day: string): Promise<ModelUsage>;
   countCompletedByAgentSince(agentId: string, sinceIso: string): Promise<number>;
 
   insertPayment(p: Payment): Promise<boolean>; // false if this session already has a payment row
@@ -110,9 +114,22 @@ export interface MandateLedgerClient {
   snapshot(mandateId: string, now: string): Promise<LedgerSnapshot>;
 }
 
+export interface ModelUsage { calls: number; tokensIn: number; tokensOut: number; neurons: number }
+
 // --- LLM ----------------------------------------------------------------------
 export interface LlmMessage { role: 'system' | 'user' | 'assistant'; content: string }
+/** Optional metadata a real client can return alongside the text (token usage for cost tracking). */
+export interface LlmResult { text: string; usage?: { inputTokens: number; outputTokens: number } }
+export interface LlmCompleteInput {
+  purpose: string;
+  messages: LlmMessage[];
+  json?: boolean;
+  /** JSON Schema for structured output (used by providers that support it, e.g. Workers AI JSON mode). */
+  jsonSchema?: Record<string, unknown>;
+  maxTokens?: number;
+  signal?: AbortSignal;
+}
 export interface LlmClient {
   readonly name: string;
-  complete(input: { purpose: string; messages: LlmMessage[]; json?: boolean; maxTokens?: number }): Promise<string>;
+  complete(input: LlmCompleteInput): Promise<string | LlmResult>;
 }
