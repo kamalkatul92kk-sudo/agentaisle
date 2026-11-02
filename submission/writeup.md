@@ -149,7 +149,7 @@ No login, token or install is needed. Everything runs on the PayPal **sandbox** 
   - **Ops agent:** the merchant's chat assistant uses the model to pick read-only tools, rate refund risk with a short rationale, and advise on held orders. It can only *propose* actions; a human approves them.
   - **Deterministic, in code:** prices, floor prices, discounts, mandate caps, category limits, risk holds, approvals, refund amounts, PayPal calls and webhook checks. Every model reply is validated (JSON schema, timeout, code guards); on any failure the app uses the rule-based version, and the console shows a model or fallback badge on each decision.
   - Prompt injection: buyer notes reach the model only as quoted data. Tests show an injected note cannot change a price, a cap or an approval.
-- **In development (draft, confirm before submitting):**
+- **In development:**
   - An AI coding assistant (Grok Bot) helped write and test code, run the PayPal sandbox checks, draft this write-up and the docs, and record the demo video.
   - The video narration is synthetic speech generated with xAI Grok Text to Speech (voice "Ara"). It does not imitate any real person.
   - Every number, ID and screenshot in this submission comes from real runs against the PayPal sandbox; the architecture card and the terminal clip in the video replay real captured output rather than being live screen captures, and the video says so on screen.
