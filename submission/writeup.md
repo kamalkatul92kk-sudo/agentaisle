@@ -74,12 +74,13 @@ We wanted to show a small shop, a fictional Texas coffee roaster, that sells saf
   - It also has custom cell renderers, an external filter for presets, column state and filter-model save and restore, pinned rows and columns, CSV export, and the Theming API.
   - Rollups and sparklines are computed in our own tested code, so we stay within the MIT Community packages.
 - **AG Studio:** an AG Studio report over the same data model lives behind a build flag and is turned on only with a licence key.
-- **Tests:** 85 vitest tests, including:
+- **Tests:** 109 vitest tests, including:
   - 13 agent-safety scenarios (over-cap, floor price, cross-agent access, forged mandates, idempotent replay, prompt injection, velocity holds, "refund all" refusal, and more);
   - the MCP contract;
   - PayPal REST against a fake server;
   - a signed-webhook-to-grid integration test;
-  - a guard that fails if any AG Grid Enterprise feature slips in.
+  - a guard that fails if any AG Grid Enterprise feature slips in;
+  - 24 AI-layer tests with mocked models (valid, malformed and slow replies, below-floor and over-cap proposals, prompt injection, daily budget).
 
 **Real sandbox results (Oct 28, 2026):**
 
@@ -138,14 +139,16 @@ No login, token or install is needed. Everything runs on the PayPal **sandbox** 
 5. **Approvals** tab: orders held by risk rules wait here (read-only for visitors).
 6. **Agents & rollups** tab: switch the group-by (Persona, Agent, Platform, Status, Payment mode); sort or filter the grid and the linked chart follows. Use the moon/sun button to switch light/dark.
 7. **Replay:** in the session inspector, click **Open full replay** to see that session's complete, timestamped event timeline.
-8. To run it yourself: `npm ci && npm test` (85 tests, no PayPal account needed) and the README Quick start for a local Worker with mock payments.
+8. To run it yourself: `npm ci && npm test` (109 tests, no PayPal account needed) and the README Quick start for a local Worker with mock payments.
 
 ## AI tools used (required by the rules)
 
-- **In the product:**
-  - AgentAisle is built for AI buyer agents. The demo's buyer agents are scripted simulator personas that call the same MCP/REST API a real agent would.
-  - Negotiation copy and the merchant "ops agent" go through an `LlmClient` interface. The public demo runs it in deterministic **stub** mode (no external LLM).
-  - An OpenAI-compatible client can be switched on (`LLM_MODE=openai`), but LLM output can never set prices, links or actions.
+- **In the product:** Cloudflare Workers AI, model `@cf/meta/llama-3.3-70b-instruct-fp8-fast`, through the Worker's `AI` binding (no API key).
+  - **Buyer agents:** the simulated shopping agents use the model to choose products and quantities for each persona's goal and budget, and to decide each haggling offer and what they say.
+  - **Merchant replies:** the model rewords the shop's negotiation replies. The price itself is never the model's.
+  - **Ops agent:** the merchant's chat assistant uses the model to pick read-only tools, rate refund risk with a short rationale, and advise on held orders. It can only *propose* actions; a human approves them.
+  - **Deterministic, in code:** prices, floor prices, discounts, mandate caps, category limits, risk holds, approvals, refund amounts, PayPal calls and webhook checks. Every model reply is validated (JSON schema, timeout, code guards); on any failure the app uses the rule-based version, and the console shows a model or fallback badge on each decision.
+  - Prompt injection: buyer notes reach the model only as quoted data. Tests show an injected note cannot change a price, a cap or an approval.
 - **In development (draft, confirm before submitting):**
   - An AI coding assistant (Grok Bot) helped write and test code, run the PayPal sandbox checks, draft this write-up and the docs, and record the demo video.
   - The video narration is synthetic speech generated with xAI Grok Text to Speech (voice "Ara"). It does not imitate any real person.
