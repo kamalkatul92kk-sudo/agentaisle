@@ -9,7 +9,7 @@ Demo merchant: **Pecan Plume Coffee Co.**, a fictional Texas coffee roaster. All
 **Links**
 - Source: https://github.com/kamalkatul92kk-sudo/agentaisle
 - Live demo (read-only, PayPal sandbox): https://agentaisle-demo.kamalkatul92-kk.workers.dev
-- Demo video (under 3 minutes): https://youtu.be/0LZBDRTz6PQ · cover: [`submission/video/cover.png`](submission/video/cover.png)
+- Demo video (under 3 minutes): https://youtu.be/s_W2hhFQJGc · cover: [`submission/video/cover.png`](submission/video/cover.png)
 - Devpost write-up: [`submission/writeup.md`](submission/writeup.md) · judge testing steps: [Testing instructions for judges](submission/writeup.md#testing-instructions-for-judges)
 - Video script: [`submission/video-script.md`](submission/video-script.md) · screenshots: [`submission/screenshots/`](submission/screenshots/)
 

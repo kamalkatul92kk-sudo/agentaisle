@@ -10,7 +10,7 @@
 
 **Repo:** https://github.com/kamalkatul92kk-sudo/agentaisle
 
-**Video:** https://youtu.be/0LZBDRTz6PQ (2:44, 1080p, synthetic narration + burned-in captions; cover image `submission/video/cover.png`)
+**Video:** https://youtu.be/s_W2hhFQJGc (2:48, 1080p, synthetic narration + burned-in captions; cover image `submission/video/cover.png`)
 
 ---
 
